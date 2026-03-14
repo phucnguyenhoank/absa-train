@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM us-docker.pkg.dev/deeplearning-platform-release/gcr.io/pytorch-cu124.2-4.py310
 
 # 1. Set the working directory
 WORKDIR /app
@@ -12,13 +12,10 @@ RUN apt-get update && apt-get install -y \
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# 3. Copy requirements first (better for caching)
-RUN pip install --no-cache-dir torch>=2.10.0
-
-RUN pip install --no-cache-dir transformers>=5.3.0 datasets>=4.7.0
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    transformers>=4.30.0 \
+    datasets>=2.12.0 \
+    py-vncorenlp>=0.1.4
 
 # 4. Copy the rest of your code
 COPY . .
