@@ -14,14 +14,14 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 RUN pip install --no-cache-dir \
     transformers>=4.29.2 \
-    datasets<4.0.0 \
+    datasets datasets<4.0.0 \
     py-vncorenlp>=0.1.4
 
 # 4. Copy the rest of your code
 COPY . .
 
-ENV TRUST_REMOTE_CODE=True
-ENV TORCH_SKIP_VERSION_CHECK=1 
+# ENV TRUST_REMOTE_CODE=True
+# ENV TORCH_SKIP_VERSION_CHECK=1 
 
 # 5. The command that actually runs your script
 CMD ["python", "train.py"]
