@@ -1,0 +1,1 @@
+gcloud storage cat gs://absa-model-storage/models/model.txt
