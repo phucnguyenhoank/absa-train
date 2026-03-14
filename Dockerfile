@@ -13,9 +13,9 @@ ENV JAVA_HOME=/usr/lib/jvm/default-java
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 RUN pip install --no-cache-dir \
-    transformers>=4.30.0 \
-    datasets>=2.12.0 \
-    py-vncorenlp>=0.1.4
+    transformers \
+    datasets \
+    py-vncorenlp
 
 # 4. Copy the rest of your code
 COPY . .
