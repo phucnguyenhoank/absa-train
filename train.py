@@ -1,22 +1,16 @@
-# %%
 import sys
 
 print(sys.version)
 
 import os
 import json
-from transformers import (
-    DataCollatorWithPadding,
-    AutoModel,
-)
+from transformers import DataCollatorWithPadding, AutoModel
 from torch.utils.data import DataLoader, Subset
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from collections import Counter
-import matplotlib.pyplot as plt
 
-from upload_file import upload_model
 from config import *
 from data import (
     train_dataset,
@@ -26,8 +20,9 @@ from data import (
 )
 
 run_mode = os.getenv("RUN_MODE")
+print(f"run_mode={run_mode}")
 
-if run_mode == "sanity_check" or True:
+if run_mode == "sanity_check":
     train_dataset = Subset(train_dataset, range(SUBSET_SIZE))
     val_dataset = Subset(val_dataset, range(SUBSET_SIZE))
     test_dataset = Subset(test_dataset, range(SUBSET_SIZE))
@@ -135,7 +130,7 @@ model = PhoBERTMultiHead(
     num_sentiments=len(idx2sentiment),
 )
 model.to(device)
-optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5)
+optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
 
 # Training
@@ -219,7 +214,7 @@ for epoch in range(EPOCHS):
     # -------------------
     # EARLY STOPPING
     # -------------------
-    if patience_counter >= patience:
+    if patience_counter >= PATIENCE:
         print("Early stopping")
         break
 
@@ -228,25 +223,12 @@ history_path = "loss_history.json"
 with open(history_path, "w") as f:
     json.dump(history, f)
 
-print("Loss history saved!")
+print("DONE training")
 
-with open(history_path) as f:
-    history = json.load(f)
-
-train_loss = history["train_loss"]
-val_loss = history["val_loss"]
-
-epochs = range(1, len(train_loss) + 1)
-
-plt.plot(epochs, train_loss, label="Train Loss")
-plt.plot(epochs, val_loss, label="Validation Loss")
-
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.title("Training vs Validation Loss")
-plt.legend()
-plt.savefig("train_vs_val_loss.png")
-print("Plot saved!")
-
-upload_model(f"{best_model_name}.pth")
-print(f"{best_model_name}.pth SAVE!")
+target_path = os.environ.get("AIP_MODEL_DIR")
+if target_path:
+    os.system(
+        f"gsutil cp {best_model_name}.pth {target_path}/{best_model_name}.pth"
+    )
+    os.system(f"gsutil cp {history_path} {target_path}/{history_path}")
+    print("Training result SAVED!")

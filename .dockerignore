@@ -5,10 +5,7 @@
 !Dockerfile
 !requirements.txt
 !train.py
-!model.txt
-!upload_file.py
 !config.py
 !data.py
 !uit-vsfc/
 !vncorenlp/
-!phobert-base-v2/

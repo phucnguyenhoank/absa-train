@@ -2,7 +2,8 @@ SUBSET_SIZE = 64
 
 BATCH_SIZE = 32
 EPOCHS = 5
-patience = 3
+PATIENCE = 3
+LEARNING_RATE = 2e-5
 best_model_name = "vnsf-44"
 
 backbone_model_name = "vinai/phobert-base-v2"
