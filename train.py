@@ -13,6 +13,7 @@ from data import train_dataset, val_dataset, tokenizer
 from model import PhoBERTMultiHead
 from trainer import train_epoch, eval_epoch
 from utils import calculate_alpha
+from record import upload_blob
 
 
 def main(args):
@@ -92,26 +93,8 @@ def main(args):
         json.dump(history, f)
 
     if args.output_dir:
-        subprocess.run(
-            [
-                "gcloud",
-                "storage",
-                "cp",
-                f"{best_model_name}.pth",
-                f"{args.output_dir}/{best_model_name}.pth",
-            ],
-            check=True,
-        )
-        subprocess.run(
-            [
-                "gcloud",
-                "storage",
-                "cp",
-                f"{history_file_name}",
-                f"{args.output_dir}/{history_file_name}",
-            ],
-            check=True,
-        )
+        upload_blob(f"{best_model_name}.pth", args.output_dir)
+        upload_blob(history_file_name, args.output_dir)
         print(f"Training result SAVED {args.output_dir}!")
     else:
         print("Done training with NO SAVING")

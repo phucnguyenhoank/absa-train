@@ -15,6 +15,7 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 RUN pip install --no-cache-dir py-vncorenlp
 RUN pip install --no-cache-dir transformers
 RUN pip install --no-cache-dir datasets
+RUN pip install --no-cache-dir google-cloud-storage
 
 # 4. Copy the rest of your code
 COPY . .

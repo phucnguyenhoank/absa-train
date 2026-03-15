@@ -10,5 +10,6 @@
 !loss.py
 !model.py
 !trainer.py
+!record.py
 !utils.py
 !uit-vsfc/
