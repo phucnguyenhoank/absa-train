@@ -37,7 +37,7 @@ val_loader = DataLoader(
 )
 
 
-def calculate_alpha(dataset, num_classes=4):
+def calculate_alpha(dataset, num_classes=4, device="cpu"):
     all_labels = []
 
     for i in range(len(dataset)):
@@ -55,13 +55,7 @@ def calculate_alpha(dataset, num_classes=4):
         weight = 1.0 - (class_count / total)
         alpha.append(weight)
 
-    return torch.tensor(alpha), counts
-
-
-alpha_weights, class_counts = calculate_alpha(train_dataset)
-
-print(f"Counts per class (not sorted): {class_counts}")
-print(f"Recommended alpha: {alpha_weights}")
+    return torch.tensor(alpha).to(device), counts
 
 
 class PhoBERTMultiHead(nn.Module):
@@ -132,6 +126,9 @@ model = PhoBERTMultiHead(
 model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
+alpha_weights, class_counts = calculate_alpha(train_dataset, device)
+print(f"Counts per class (not sorted): {class_counts}")
+print(f"Recommended alpha: {alpha_weights}")
 
 # Training
 

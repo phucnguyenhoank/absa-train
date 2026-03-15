@@ -1,12 +1,22 @@
 steps:
-  # build the image
+  # 1. Build the GPU image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'asia-southeast1-docker.pkg.dev/ute-nlp-absa/absa-repo/absa-train:$SHORT_SHA', '.']
+    args: ['build', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/absa-repo/absa-train:$SHORT_SHA', '.']
 
-  # push the image to Google
+  # 2. Push the image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'asia-southeast1-docker.pkg.dev/ute-nlp-absa/absa-repo/absa-train:$SHORT_SHA']
+    args: ['push', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/absa-repo/absa-train:$SHORT_SHA']
 
-# to just show logs, not save them
+  # 3. Trigger Vertex AI Training automatically
+  - name: 'gcr.io/://google.com'
+    entrypoint: 'gcloud'
+    args:
+      - 'ai'
+      - 'custom-jobs'
+      - 'create'
+      - '--region=asia-southeast1'
+      - '--display-name=absa-training-$SHORT_SHA'
+      - '--worker-pool-spec=machine-type=n1-standard-4,accelerator-type=NVIDIA_TESLA_T4,accelerator-count=1,container-image-uri=asia-southeast1-docker.pkg.dev/$PROJECT_ID/absa-repo/absa-train:$SHORT_SHA'
+      - '--base-output-directory=gs://absa-models-bucket/absa-training-$SHORT_SHA/'
 options:
   logging: CLOUD_LOGGING_ONLY
