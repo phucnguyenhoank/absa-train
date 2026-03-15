@@ -1,1 +1,1 @@
-uv run train.py --output_dir=gs://absa-models-bucket/absa-training-xxx
+uv run train.py --output_dir=gs://absa-models-bucket/absa-training-cde --run_mode=sanity_check

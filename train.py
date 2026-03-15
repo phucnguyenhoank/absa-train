@@ -91,7 +91,8 @@ def main(args):
     if args.output_dir:
         subprocess.run(
             [
-                "gsutil",
+                "gcloud",
+                "storage",
                 "cp",
                 f"{best_model_name}.pth",
                 f"{args.output_dir}/{best_model_name}.pth",
@@ -100,7 +101,8 @@ def main(args):
         )
         subprocess.run(
             [
-                "gsutil",
+                "gcloud",
+                "storage",
                 "cp",
                 f"{history_file_name}",
                 f"{args.output_dir}/{history_file_name}",
