@@ -19,8 +19,5 @@ RUN pip install --no-cache-dir datasets
 # 4. Copy the rest of your code
 COPY . .
 
-# ENV TRUST_REMOTE_CODE=True
-# ENV TORCH_SKIP_VERSION_CHECK=1 
-
 # 5. The command that actually runs your script
 CMD ["python", "train.py"]

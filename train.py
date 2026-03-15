@@ -4,6 +4,7 @@ print(sys.version)
 
 import os
 import json
+
 from transformers import DataCollatorWithPadding, AutoModel
 from torch.utils.data import DataLoader, Subset
 import torch
@@ -18,6 +19,9 @@ from data import (
     test_dataset,
     tokenizer,
 )
+
+target_path = os.getenv("AIP_MODEL_DIR")
+print(f"AIP_MODEL_DIR={target_path}")
 
 run_mode = os.getenv("RUN_MODE")
 print(f"run_mode={run_mode}")
@@ -222,10 +226,10 @@ with open(history_path, "w") as f:
 
 print("DONE training")
 
-target_path = os.environ.get("AIP_MODEL_DIR")
+
 if target_path:
     os.system(
         f"gsutil cp {best_model_name}.pth {target_path}/{best_model_name}.pth"
     )
     os.system(f"gsutil cp {history_path} {target_path}/{history_path}")
-    print("Training result SAVED!")
+    print(f"Training result SAVED {target_path}!")
