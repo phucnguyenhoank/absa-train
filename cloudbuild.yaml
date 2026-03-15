@@ -8,7 +8,7 @@ steps:
     args: ['push', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/absa-repo/absa-train:$SHORT_SHA']
 
   # 3. Trigger Vertex AI Training automatically
-  - name: 'gcr.io/://google.com'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: 'gcloud'
     args:
       - 'ai'
