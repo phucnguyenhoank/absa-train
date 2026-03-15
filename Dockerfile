@@ -1,4 +1,4 @@
-FROM us-docker.pkg.dev/deeplearning-platform-release/gcr.io/pytorch-cu124.2-4.py310
+FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-runtime
 
 # 1. Set the working directory
 WORKDIR /app
@@ -12,10 +12,9 @@ RUN apt-get update && apt-get install -y \
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-RUN pip install --no-cache-dir \
-    transformers==4.38.2 \
-    datasets>=2.12.0 \
-    py-vncorenlp>=0.1.4
+RUN pip install --no-cache-dir py-vncorenlp
+RUN pip install --no-cache-dir transformers
+RUN pip install --no-cache-dir datasets
 
 # 4. Copy the rest of your code
 COPY . .
