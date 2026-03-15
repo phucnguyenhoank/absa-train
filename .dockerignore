@@ -7,4 +7,8 @@
 !train.py
 !config.py
 !data.py
+!loss.py
+!model.py
+!trainer.py
+!utils.py
 !uit-vsfc/

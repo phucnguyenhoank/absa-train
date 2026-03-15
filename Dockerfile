@@ -20,4 +20,8 @@ RUN pip install --no-cache-dir datasets
 COPY . .
 
 # 5. The command that actually runs your script
-CMD ["python", "train.py"]
+# This is what always runs
+ENTRYPOINT ["python", "train.py"]
+
+# This is the default if the box is empty
+CMD [] 
