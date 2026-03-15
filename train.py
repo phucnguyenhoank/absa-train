@@ -17,11 +17,14 @@ from utils import calculate_alpha
 
 def main(args):
     print(f"START WITH ARGS: {args}")
+
     train_data = train_dataset
     val_data = val_dataset
+    running_epochs = args.epochs
     if args.run_mode == "sanity_check":
         train_data = Subset(train_dataset, range(SUBSET_SIZE))
         val_data = Subset(val_dataset, range(SUBSET_SIZE))
+        running_epochs = 5
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Training device:", device)
@@ -51,7 +54,7 @@ def main(args):
     train_losses = []
     val_losses = []
 
-    for epoch in range(EPOCHS):
+    for epoch in range(running_epochs):
 
         print(f"\nEpoch {epoch+1}")
 
@@ -125,6 +128,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--run_mode", type=str, default="train", help="train | sanity_check"
     )
+
+    parser.add_argument("--epochs", type=int, default=EPOCHS)
 
     parser.add_argument("--learning_rate", type=float, default=LEARNING_RATE)
 

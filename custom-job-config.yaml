@@ -1,2 +1,0 @@
-baseOutputDirectory:
-  outputUriPrefix: gs://absa-models-bucket/absa-training-$SHORT_SHA/
