@@ -1,0 +1,2 @@
+baseOutputDirectory:
+  outputUriPrefix: gs://absa-models-bucket/absa-training-1/

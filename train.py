@@ -126,7 +126,7 @@ model = PhoBERTMultiHead(
 model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
-alpha_weights, class_counts = calculate_alpha(train_dataset, device)
+alpha_weights, class_counts = calculate_alpha(train_dataset, device=device)
 print(f"Counts per class (not sorted): {class_counts}")
 print(f"Recommended alpha: {alpha_weights}")
 
