@@ -2,7 +2,7 @@ from load import load_model
 from preprocess import tokenizer, rdrsegmenter
 from config import idx2topic, idx2sentiment
 
-check_point = "absa-training-084e5eb_vnsf-44.pth"
+check_point = "absa-training-5111d82_vnsf-44.pth"
 model = load_model(check_point)
 model.eval()
 
@@ -50,7 +50,7 @@ model.eval()
 # ------------------------------------------
 
 
-test_sentence = "thầy dạy không có đủ chuyên môn, dạy sai kiến thức ."
+test_sentence = "thầy dạy không có đủ chuyên môn"
 
 dot_separated_segmented_sentences = rdrsegmenter.word_segment(test_sentence)
 test_segmented_sentence = " ".join(dot_separated_segmented_sentences)

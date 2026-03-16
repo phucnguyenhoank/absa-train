@@ -48,8 +48,6 @@ def preprocess_function(examples):
 
     labels = []
     for topic, sentiment in zip(examples["topic"], examples["sentiment"]):
-        # topic: 0, sentiment: 2
-
         aspect_labels = [sentiment2idx["none"]] * len(idx2topic)
         aspect_labels[topic] = sentiment
         labels.append(aspect_labels)

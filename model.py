@@ -14,7 +14,8 @@ class PhoBERTMultiHead(nn.Module):
         self.phobert = AutoModel.from_pretrained(backbone_model_name)
 
         hidden_size = self.phobert.config.hidden_size
-
+        self.dropout = nn.Dropout(0.1)
+        self.norm = nn.LayerNorm(hidden_size)
         self.classifiers = nn.ModuleList(
             [
                 nn.Linear(hidden_size, num_sentiments)
@@ -28,7 +29,10 @@ class PhoBERTMultiHead(nn.Module):
             input_ids=input_ids, attention_mask=attention_mask
         )
 
-        cls_output = outputs.pooler_output  # last_hidden_state[:, 0]
+        cls_output = outputs.last_hidden_state[:, 0]
+
+        cls_output = self.norm(cls_output)
+        cls_output = self.dropout(cls_output)
 
         logits = [classifier(cls_output) for classifier in self.classifiers]
 

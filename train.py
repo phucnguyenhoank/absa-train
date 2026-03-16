@@ -4,7 +4,7 @@ import json
 import torch
 from torch.utils.data import DataLoader, Subset
 
-from transformers import DataCollatorWithPadding, AutoTokenizer
+from transformers import DataCollatorWithPadding
 
 from config import *
 from data import train_dataset, val_dataset
