@@ -8,7 +8,7 @@ LEARNING_RATE = 2e-5
 
 best_model_name = "vnsf-44"
 backbone_model_name = "vinai/phobert-base-v2"
-topic_map = {
+idx2topic = {
     0: "lecturer",
     1: "training_program",
     2: "facility",

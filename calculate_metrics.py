@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from transformers import DataCollatorWithPadding, AutoTokenizer
+from transformers import DataCollatorWithPadding
 from sklearn.metrics import (
     f1_score,
     classification_report,
@@ -11,13 +11,12 @@ import matplotlib.pyplot as plt
 
 from config import BATCH_SIZE
 from data import test_dataset
-from load import load_eval_model
+from load import load_model
 from preprocess import tokenizer
 
-
-CHECKPOINT = "absa-training-368da43_vnsf-44.pth"
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-model = load_eval_model(CHECKPOINT)
+CHECKPOINT = "absa-training-084e5eb_vnsf-44.pth"
+model = load_model(CHECKPOINT)
 print("Model loaded!")
 
 collator = DataCollatorWithPadding(tokenizer)

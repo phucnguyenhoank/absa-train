@@ -1,9 +1,10 @@
-from datasets import load_from_disk
+from datasets import load_from_disk, load_dataset
 
-from config import sentiment2idx, topic_map
+from config import sentiment2idx, idx2topic
 from preprocess import tokenizer, rdrsegmenter
 
 ds = load_from_disk("uit-vsfc")
+print(ds["test"][0])
 
 
 def segment_text(example):
@@ -30,7 +31,9 @@ def segment_text(example):
     return example
 
 
+# rm -rf ~/.cache/huggingface/datasets, or load_from_cache_file=False
 ds_segmented = ds.map(segment_text)
+print(ds_segmented["test"][0])
 
 
 def preprocess_function(examples):
@@ -45,7 +48,9 @@ def preprocess_function(examples):
 
     labels = []
     for topic, sentiment in zip(examples["topic"], examples["sentiment"]):
-        aspect_labels = [sentiment2idx["none"]] * len(topic_map)
+        # topic: 0, sentiment: 2
+
+        aspect_labels = [sentiment2idx["none"]] * len(idx2topic)
         aspect_labels[topic] = sentiment
         labels.append(aspect_labels)
 
@@ -54,6 +59,8 @@ def preprocess_function(examples):
 
 
 tokenized_datasets = ds_segmented.map(preprocess_function, batched=True)
+print(tokenized_datasets["test"][0])
+
 
 # Convert to PyTorch format
 pt_datasets = tokenized_datasets.remove_columns(
@@ -64,6 +71,7 @@ pt_datasets.set_format(
     type="torch",
     columns=["input_ids", "attention_mask", "labels"],
 )
+print(pt_datasets["test"][0])
 
 
 train_dataset = pt_datasets["train"]

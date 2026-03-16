@@ -42,7 +42,7 @@ def main(args):
 
     model = PhoBERTMultiHead(
         backbone_model_name,
-        num_aspects=len(topic_map),
+        num_aspects=len(idx2topic),
         num_sentiments=len(idx2sentiment),
     ).to(device)
 
