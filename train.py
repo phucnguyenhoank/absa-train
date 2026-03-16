@@ -2,18 +2,18 @@ import os
 import argparse
 import json
 import torch
-import subprocess
 from torch.utils.data import DataLoader, Subset
 
-from transformers import DataCollatorWithPadding
+from transformers import DataCollatorWithPadding, AutoTokenizer
 
 from config import *
-from data import train_dataset, val_dataset, tokenizer
+from data import train_dataset, val_dataset
 
 from model import PhoBERTMultiHead
 from trainer import train_epoch, eval_epoch
 from utils import calculate_alpha
 from record import upload_blob
+from preprocess import tokenizer
 
 
 def main(args):

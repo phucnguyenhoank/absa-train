@@ -3,7 +3,7 @@ from google.cloud import storage
 
 def upload_blob(source_file, destination_path):
     # 1. Create the client (the connection)
-    client = storage.Client()
+    client = storage.Client(project="ute-nlp-absa")
 
     # 2. Link the path to the client
     # This tells Google: "Use this connection to find this file"

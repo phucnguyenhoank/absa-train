@@ -34,4 +34,4 @@ class PhoBERTMultiHead(nn.Module):
 
         logits = torch.stack(logits, dim=1)
 
-        return logits
+        return logits  # (batch, aspects=4, sentiments=4)

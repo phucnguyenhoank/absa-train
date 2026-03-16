@@ -1,43 +1,9 @@
-import os
-import py_vncorenlp
-
-from pathlib import Path
 from datasets import load_from_disk
-from transformers import AutoTokenizer
-from config import backbone_model_name, sentiment2idx, topic_map
+
+from config import sentiment2idx, topic_map
+from preprocess import tokenizer, rdrsegmenter
 
 ds = load_from_disk("uit-vsfc")
-
-cwd = Path.cwd()
-
-# Define the ABSOLUTE path
-save_dir = (cwd / "vncorenlp").resolve()
-
-# Manually create the parent directory first
-# The library's download_model fails because it can't create /vncorenlp/models
-# if /vncorenlp doesn't exist yet.
-save_dir.mkdir(parents=True, exist_ok=True)
-
-if not (save_dir / "models").exists():
-    print(f"Downloading models to {save_dir}...")
-    # The command below tried to run a command like: Create folder "models" inside "vncorenlp"
-    # BUT it does not create the "vncorenlp" folder.
-    # VERY VERY FRUSTRATING
-    py_vncorenlp.download_model(save_dir=save_dir.as_posix())
-else:
-    print("Models already exist, skipping download.")
-
-
-try:
-    rdrsegmenter = py_vncorenlp.VnCoreNLP(
-        annotators=["wseg"], save_dir=save_dir.as_posix()
-    )
-    print("Segmenter loaded successfully!")
-except Exception as e:
-    print(f"Error loading segmenter: {e}")
-
-os.chdir(cwd)
-print(Path.cwd())
 
 
 def segment_text(example):
@@ -56,18 +22,15 @@ def segment_text(example):
     sentence = example["sentence"]
 
     # if the input sentence contains ".",
-    # the sentence result will be separated.
+    # the sentence result will be separated into a list.
     dot_separated_segmented_sentences = rdrsegmenter.word_segment(sentence)
 
-    # Join back into a single string with spaces
+    # Join the list of sentences back into a single string with spaces
     example["sentence"] = " ".join(dot_separated_segmented_sentences)
     return example
 
 
 ds_segmented = ds.map(segment_text)
-
-
-tokenizer = AutoTokenizer.from_pretrained(backbone_model_name)
 
 
 def preprocess_function(examples):
@@ -81,7 +44,7 @@ def preprocess_function(examples):
     )
 
     labels = []
-    for topic, sentiment in zip(examples["sentiment"], examples["topic"]):
+    for topic, sentiment in zip(examples["topic"], examples["sentiment"]):
         aspect_labels = [sentiment2idx["none"]] * len(topic_map)
         aspect_labels[topic] = sentiment
         labels.append(aspect_labels)
