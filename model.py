@@ -17,11 +17,11 @@ class PhoBERTMultiHead(nn.Module):
             param.requires_grad = False
 
         # unfreeze 1 last layers of PhoBERT
-        for param in self.phobert.encoder.layer[-1:].parameters():
+        for param in self.phobert.encoder.layer[-2:].parameters():
             param.requires_grad = True
 
         hidden_size = self.phobert.config.hidden_size
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.3)
         self.norm = nn.LayerNorm(hidden_size)
         self.classifiers = nn.ModuleList(
             [
@@ -36,12 +36,30 @@ class PhoBERTMultiHead(nn.Module):
             input_ids=input_ids, attention_mask=attention_mask
         )
 
-        cls_output = outputs.last_hidden_state[:, 0]
+        hidden = outputs.last_hidden_state  # (B, T, H)
 
-        cls_output = self.norm(cls_output)
-        cls_output = self.dropout(cls_output)
+        logits = []
 
-        logits = [classifier(cls_output) for classifier in self.classifiers]
+        for attn, classifier in zip(self.attentions, self.classifiers):
+
+            # compute attention score for each token
+            scores = attn(hidden).squeeze(-1)  # (B, T)
+
+            # mask padding tokens
+            scores = scores.masked_fill(attention_mask == 0, -1e9)
+
+            # normalize
+            weights = torch.softmax(scores, dim=1)  # (B, T)
+
+            # weighted sum of token embeddings
+            aspect_embedding = torch.sum(
+                hidden * weights.unsqueeze(-1), dim=1
+            )  # (B, H)
+
+            aspect_embedding = self.norm(aspect_embedding)
+            aspect_embedding = self.dropout(aspect_embedding)
+
+            logits.append(classifier(aspect_embedding))
 
         logits = torch.stack(logits, dim=1)
 
