@@ -21,6 +21,9 @@ class PhoBERTMultiHead(nn.Module):
             param.requires_grad = True
 
         hidden_size = self.phobert.config.hidden_size
+        self.attentions = nn.ModuleList(
+            [nn.Linear(hidden_size, 1) for _ in range(num_aspects)]
+        )
         self.dropout = nn.Dropout(0.3)
         self.norm = nn.LayerNorm(hidden_size)
         self.classifiers = nn.ModuleList(
