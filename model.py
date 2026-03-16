@@ -28,7 +28,7 @@ class PhoBERTMultiHead(nn.Module):
             input_ids=input_ids, attention_mask=attention_mask
         )
 
-        cls_output = outputs.last_hidden_state[:, 0]
+        cls_output = outputs.pooler_output  # last_hidden_state[:, 0]
 
         logits = [classifier(cls_output) for classifier in self.classifiers]
 
