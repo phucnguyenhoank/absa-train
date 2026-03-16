@@ -46,6 +46,11 @@ def main(args):
         num_sentiments=len(idx2sentiment),
     ).to(device)
 
+    print("Trainable layers:")
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            print(name)
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
 
     alpha, counts = calculate_alpha(train_data, device=device)

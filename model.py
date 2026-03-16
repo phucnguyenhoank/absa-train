@@ -12,6 +12,9 @@ class PhoBERTMultiHead(nn.Module):
         self.num_sentiments = num_sentiments
 
         self.phobert = AutoModel.from_pretrained(backbone_model_name)
+        # freeze backbone
+        for param in self.phobert.parameters():
+            param.requires_grad = False
 
         hidden_size = self.phobert.config.hidden_size
         self.dropout = nn.Dropout(0.1)

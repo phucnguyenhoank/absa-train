@@ -15,7 +15,7 @@ from load import load_model
 from preprocess import tokenizer
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CHECKPOINT = "absa-training-5111d82_vnsf-44.pth"
+CHECKPOINT = "absa-training-18833cf_vnsf-44_norm_dropout.pth"
 model = load_model(CHECKPOINT)
 print("Model loaded!")
 
