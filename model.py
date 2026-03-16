@@ -16,8 +16,8 @@ class PhoBERTMultiHead(nn.Module):
         for param in self.phobert.parameters():
             param.requires_grad = False
 
-        # unfreeze 3 last layers of PhoBERT
-        for param in self.phobert.encoder.layer[-3:].parameters():
+        # unfreeze 1 last layers of PhoBERT
+        for param in self.phobert.encoder.layer[-1:].parameters():
             param.requires_grad = True
 
         hidden_size = self.phobert.config.hidden_size
