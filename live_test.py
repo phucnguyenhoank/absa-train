@@ -2,7 +2,7 @@ from load import load_model
 from preprocess import tokenizer, rdrsegmenter
 from config import idx2topic, idx2sentiment
 
-check_point = "absa-training-18833cf_vnsf-44_norm_dropout.pth"
+check_point = "absa-training-4d2bce8_vnsf-44_freeze_backbone.pth"
 model = load_model(check_point)
 model.eval()
 
@@ -50,7 +50,7 @@ model.eval()
 # ------------------------------------------
 
 
-test_sentence = "phòng máy xịn"
+test_sentence = "phòng máy tốt"
 
 dot_separated_segmented_sentences = rdrsegmenter.word_segment(test_sentence)
 test_segmented_sentence = " ".join(dot_separated_segmented_sentences)
@@ -61,7 +61,7 @@ test_tokenized_sentence = tokenizer(
 )
 
 logits = model(**test_tokenized_sentence)
-
+print(logits)
 preds = logits.argmax(dim=-1)
 pred = preds[0]
 
