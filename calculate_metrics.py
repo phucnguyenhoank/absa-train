@@ -13,10 +13,10 @@ from config import BATCH_SIZE
 from data import test_dataset
 from load import load_model
 from preprocess import tokenizer
+from config_test import TEST_MODEL_NAME
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CHECKPOINT = "absa-training-4d2bce8_vnsf-44_freeze_backbone.pth"
-model = load_model(CHECKPOINT)
+model = load_model(TEST_MODEL_NAME)
 print("Model loaded!")
 
 collator = DataCollatorWithPadding(tokenizer)

@@ -13,3 +13,4 @@ wheels/
 vncorenlp/
 phobert-base-v2/
 *.pth
+*loss_history.json

@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import json
-
-history_path = "loss_history.json"
+from config_test import history_path
 
 with open(history_path) as f:
     history = json.load(f)

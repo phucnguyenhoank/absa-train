@@ -26,6 +26,7 @@ def main(args):
         train_data = Subset(train_dataset, range(SUBSET_SIZE))
         val_data = Subset(val_dataset, range(SUBSET_SIZE))
         running_epochs = 5
+        print(f"sanity_check, running_epochs changed to {running_epochs}")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print("Training device:", device)

@@ -1,9 +1,36 @@
-from datasets import load_from_disk, load_dataset
+import pandas as pd
+from datasets import Dataset, DatasetDict
+import ast
 
 from config import sentiment2idx, idx2topic
 from preprocess import tokenizer, rdrsegmenter
 
-ds = load_from_disk("uit-vsfc")
+
+def load_and_fix_dataset(file_path):
+    # 1. Load with pandas (it will treat [0, 1] as a string automatically)
+    df = pd.read_csv(file_path)
+
+    # 2. Convert the string "[0, 1]" into an actual Python list [0, 1]
+    # We use ast.literal_eval because it's safer than eval()
+    df["topic"] = df["topic"].apply(lambda x: ast.literal_eval(str(x)))
+    df["sentiment"] = df["sentiment"].apply(lambda x: ast.literal_eval(str(x)))
+    return Dataset.from_pandas(df)
+
+
+# Load all splits
+ds = DatasetDict(
+    {
+        "train": load_and_fix_dataset(
+            "multisentiment-uit-vsfc/multi_aspect_train.csv"
+        ),
+        "validation": load_and_fix_dataset(
+            "multisentiment-uit-vsfc/multi_aspect_validation.csv"
+        ),
+        "test": load_and_fix_dataset(
+            "multisentiment-uit-vsfc/multi_aspect_test.csv"
+        ),
+    }
+)
 print(ds["test"][0])
 
 
@@ -47,9 +74,17 @@ def preprocess_function(examples):
     )
 
     labels = []
-    for topic, sentiment in zip(examples["topic"], examples["sentiment"]):
+
+    for topics, sentiments in zip(examples["topic"], examples["sentiment"]):
+
+        # Create the base label list (e.g., [0, 0, 0, 0])
         aspect_labels = [sentiment2idx["none"]] * len(idx2topic)
-        aspect_labels[topic] = sentiment
+
+        # Loop through both lists at the same time
+        for t, s in zip(topics, sentiments):
+            # Map specific sentiment 's' to specific topic 't'
+            aspect_labels[int(t)] = int(s)
+
         labels.append(aspect_labels)
 
     model_inputs["labels"] = labels
