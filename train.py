@@ -10,7 +10,7 @@ from transformers import DataCollatorWithPadding
 from config import *
 from data import train_dataset, val_dataset
 
-from model import MultiHeadSigmoid
+from model import SimpleMultiHeadSigmoid
 from trainer import train_epoch, eval_epoch
 
 # from utils import calculate_alpha
@@ -43,7 +43,7 @@ def main(args):
         val_data, batch_size=BATCH_SIZE, collate_fn=collator
     )
 
-    model = MultiHeadSigmoid(
+    model = SimpleMultiHeadSigmoid(
         backbone_model_name,
         num_aspects=len(idx2topic),
         num_sentiments=len(idx2sentiment),

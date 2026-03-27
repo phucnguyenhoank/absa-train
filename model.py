@@ -145,3 +145,40 @@ class MultiHeadSigmoid(nn.Module):
         logits = torch.stack(all_aspect_logits, dim=1)
 
         return logits
+
+
+class SimpleMultiHeadSigmoid(nn.Module):
+    def __init__(self, backbone_model_name, num_aspects=4, num_sentiments=3):
+        super().__init__()
+        self.num_aspects = num_aspects
+        self.num_sentiments = num_sentiments
+
+        # 1. Load and Freeze Backbone
+        self.backbone = AutoModel.from_pretrained(backbone_model_name)
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+
+        hidden_size = self.backbone.config.hidden_size
+
+        # 2. Minimal Linear Head: (Hidden_Size -> 4 * 3)
+        # This maps the sentence embedding directly to all 12 sentiment nodes
+        self.classifier = nn.Linear(hidden_size, num_aspects * num_sentiments)
+
+    def forward(self, input_ids, attention_mask):
+        # Get hidden states
+        outputs = self.backbone(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
+
+        # Use the [CLS] token (index 0) as the sentence representation
+        # Shape: (Batch, Hidden_Size)
+        cls_output = outputs.last_hidden_state[:, 0, :]
+
+        # Single linear pass
+        # Shape: (Batch, 12)
+        logits = self.classifier(cls_output)
+
+        # Reshape to match the original model's output: (Batch, 4, 3)
+        logits = logits.view(-1, self.num_aspects, self.num_sentiments)
+
+        return logits
