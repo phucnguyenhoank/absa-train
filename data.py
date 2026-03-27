@@ -64,8 +64,7 @@ print(ds_segmented["test"][0])
 
 
 def preprocess_function(examples):
-    # IMPORTANT: Ensure examples["sentence"] is ALREADY word-segmented
-
+    # Tokenize câu đầu vào
     model_inputs = tokenizer(
         examples["sentence"],
         padding=False,
@@ -73,21 +72,27 @@ def preprocess_function(examples):
         max_length=256,
     )
 
-    labels = []
+    all_labels = []
 
+    # Giả sử:
+    # examples["topic"] là list của các list: [[0, 2], [1], ...]
+    # examples["sentiment"] là list của các list: [[2, 0], [1], ...] (đã bỏ nhãn 'none')
     for topics, sentiments in zip(examples["topic"], examples["sentiment"]):
 
-        # Create the base label list (e.g., [0, 0, 0, 0])
-        aspect_labels = [sentiment2idx["none"]] * len(idx2topic)
+        # 1. Tạo ma trận nhãn toàn số 0: (num_aspects=4, num_sentiments=3)
+        # Hàng: Lecturer, Program, Facility, Others
+        # Cột: Neg, Neu, Pos
+        label_matrix = [[0.0] * 3 for _ in range(4)]
 
-        # Loop through both lists at the same time
+        # 2. Điền số 1 vào đúng vị trí Aspect + Sentiment xuất hiện
         for t, s in zip(topics, sentiments):
-            # Map specific sentiment 's' to specific topic 't'
-            aspect_labels[int(t)] = int(s)
+            topic_idx = int(t)
+            sentiment_idx = int(s)
+            label_matrix[topic_idx][sentiment_idx] = 1.0
 
-        labels.append(aspect_labels)
+        all_labels.append(label_matrix)
 
-    model_inputs["labels"] = labels
+    model_inputs["labels"] = all_labels
     return model_inputs
 
 

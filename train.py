@@ -2,6 +2,7 @@ import os
 import argparse
 import json
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
 
 from transformers import DataCollatorWithPadding
@@ -11,7 +12,8 @@ from data import train_dataset, val_dataset
 
 from model import PhoBERTMultiHead
 from trainer import train_epoch, eval_epoch
-from utils import calculate_alpha
+
+# from utils import calculate_alpha
 from record import upload_blob
 from preprocess import tokenizer
 
@@ -53,10 +55,11 @@ def main(args):
             print(name)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
+    criterion = nn.BCEWithLogitsLoss()
 
-    alpha, counts = calculate_alpha(train_data, device=device)
-    print(f"Class counts: {counts}")
-    print(f"Focal loss alpha: {alpha}")
+    # alpha, counts = calculate_alpha(train_data, device=device)
+    # print(f"Class counts: {counts}")
+    # print(f"Focal loss alpha: {alpha}")
     best_val_loss = float("inf")
     patience_counter = 0
     train_losses = []
@@ -66,9 +69,11 @@ def main(args):
 
         print(f"\nEpoch {epoch+1}")
 
-        train_loss = train_epoch(model, train_loader, optimizer, alpha, device)
+        train_loss = train_epoch(
+            model, train_loader, optimizer, criterion, device
+        )
 
-        val_loss = eval_epoch(model, val_loader, alpha, device)
+        val_loss = eval_epoch(model, val_loader, criterion, device)
 
         print("Train loss:", train_loss)
         print("Val loss:", val_loss)

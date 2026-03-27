@@ -70,3 +70,78 @@ class PhoBERTMultiHead(nn.Module):
         logits = torch.stack(logits, dim=1)
 
         return logits  # (batch, aspects=4, sentiments=4)
+
+
+class MultiHeadSigmoid(nn.Module):
+    def __init__(self, backbone_model_name, num_aspects=4, num_sentiments=3):
+        """
+        Args:
+            num_aspects: 4 (lecturer, training_program, facility, others)
+            num_sentiments: 3 (negative, neutral, positive)
+        """
+        super().__init__()
+        self.num_aspects = num_aspects
+        self.num_sentiments = num_sentiments
+
+        self.backbone = AutoModel.from_pretrained(backbone_model_name)
+
+        # Đóng băng backbone
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+
+        hidden_size = self.backbone.config.hidden_size
+
+        # Mỗi aspect có 1 Attention head riêng để tìm keyword quan trọng
+        self.aspect_attentions = nn.ModuleList(
+            [nn.Linear(hidden_size, 1) for _ in range(num_aspects)]
+        )
+
+        mid_dim = 128
+        self.sentiment_classifiers = nn.ModuleList(
+            [
+                nn.Sequential(
+                    nn.Linear(hidden_size, mid_dim),
+                    nn.BatchNorm1d(mid_dim),
+                    nn.ReLU(),
+                    nn.Dropout(p=0.3),
+                    nn.Linear(mid_dim, num_sentiments),  # Output: 3 nodes
+                )
+                for _ in range(num_aspects)
+            ]
+        )
+
+    def forward(self, input_ids, attention_mask):
+        # Lấy hidden states từ PhoBERT
+        outputs = self.backbone(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
+        hidden = (
+            outputs.last_hidden_state
+        )  # Shape: (Batch, Seq_Len, Hidden_Size)
+
+        all_aspect_logits = []
+
+        for i in range(self.num_aspects):
+            # 1. Tính Attention cho aspect thứ i
+            # (B, T, H) -> (B, T, 1) -> (B, T)
+            attn_scores = self.aspect_attentions[i](hidden).squeeze(-1)
+
+            # Masking các token padding
+            attn_scores = attn_scores.masked_fill(attention_mask == 0, -1e9)
+
+            # Chuẩn hóa trọng số attention
+            weights = torch.softmax(attn_scores, dim=1)  # (B, T)
+
+            # 2. Tổng hợp vector đại diện cho aspect (Weighted Sum)
+            # (B, T, H) * (B, T, 1) -> sum theo T -> (B, H)
+            aspect_repr = torch.sum(hidden * weights.unsqueeze(-1), dim=1)
+
+            # 3. Phân loại sentiment cho aspect đó
+            # Output shape: (B, 3) đại diện cho [Neg, Neu, Pos]
+            logit = self.sentiment_classifiers[i](aspect_repr)
+            all_aspect_logits.append(logit)
+
+        # Gộp lại thành tensor duy nhất: (Batch, 4, 3)
+        logits = torch.stack(all_aspect_logits, dim=1)
+
+        return logits

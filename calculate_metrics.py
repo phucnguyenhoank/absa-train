@@ -76,5 +76,6 @@ with torch.no_grad():
 preds = torch.cat(all_preds)
 labels = torch.cat(all_labels)
 
+print(f"{TEST_MODEL_NAME}")
 metrics = compute_metrics(preds, labels)
 print(metrics)

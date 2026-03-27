@@ -1,2 +1,2 @@
-TEST_MODEL_NAME = "absa-training-1a515eb_vnsf-44.pth"
-history_path = "absa-training-1a515eb_loss_history.json"
+TEST_MODEL_NAME = "absa-training-b36cad8_vnsf-44.pth"
+history_path = "absa-training-b36cad8_loss_history.json"

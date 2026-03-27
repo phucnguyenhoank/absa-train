@@ -1,9 +1,7 @@
 import torch
-from utils import adapt_shape
-from loss import focal_loss
 
 
-def train_epoch(model, dataloader, optimizer, alpha, device):
+def train_epoch(model, dataloader, optimizer, criterion, device):
     model.train()
 
     total_loss = 0
@@ -16,10 +14,7 @@ def train_epoch(model, dataloader, optimizer, alpha, device):
             input_ids=batch["input_ids"],
             attention_mask=batch["attention_mask"],
         )
-
-        logits, targets = adapt_shape(outputs, batch["labels"])
-
-        loss = focal_loss(logits, targets, alpha=alpha)
+        loss = criterion(outputs, batch["labels"])
 
         optimizer.zero_grad()
         loss.backward()
@@ -33,7 +28,7 @@ def train_epoch(model, dataloader, optimizer, alpha, device):
     return total_loss / len(dataloader)
 
 
-def eval_epoch(model, dataloader, alpha, device):
+def eval_epoch(model, dataloader, criterion, device):
 
     model.eval()
 
@@ -49,10 +44,7 @@ def eval_epoch(model, dataloader, alpha, device):
                 input_ids=batch["input_ids"],
                 attention_mask=batch["attention_mask"],
             )
-
-            logits, targets = adapt_shape(outputs, batch["labels"])
-
-            loss = focal_loss(logits, targets, alpha=alpha)
+            loss = criterion(outputs, batch["labels"])
 
             total_loss += loss.item()
 

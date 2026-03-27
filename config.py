@@ -14,5 +14,5 @@ idx2topic = {
     2: "facility",
     3: "others",
 }
-idx2sentiment = {0: "negative", 1: "neutral", 2: "positive", 3: "none"}
+idx2sentiment = {0: "negative", 1: "neutral", 2: "positive"}
 sentiment2idx = {v: k for k, v in idx2sentiment.items()}
