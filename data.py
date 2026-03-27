@@ -21,13 +21,13 @@ def load_and_fix_dataset(file_path):
 ds = DatasetDict(
     {
         "train": load_and_fix_dataset(
-            "multisentiment-uit-vsfc/fn_multi_aspect_train.csv"
+            "multisentiment-uit-vsfc/df_final_train.csv"
         ),
         "validation": load_and_fix_dataset(
-            "multisentiment-uit-vsfc/fn_multi_aspect_val.csv"
+            "multisentiment-uit-vsfc/df_final_validation.csv"
         ),
         "test": load_and_fix_dataset(
-            "multisentiment-uit-vsfc/fn_multi_aspect_test.csv"
+            "multisentiment-uit-vsfc/df_final_test.csv"
         ),
     }
 )

@@ -6,7 +6,7 @@ from config_test import TEST_MODEL_NAME
 model = load_model(TEST_MODEL_NAME)
 model.eval()
 
-test_sentence = "phòng máy đã cũ rồi không phù hợp cho giảng dạy"
+test_sentence = "chương trình dạy đã cũ, thầy dạy thì không nhiệt tình"
 
 dot_separated_segmented_sentences = rdrsegmenter.word_segment(test_sentence)
 test_segmented_sentence = " ".join(dot_separated_segmented_sentences)
