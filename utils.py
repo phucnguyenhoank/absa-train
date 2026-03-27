@@ -26,11 +26,17 @@ def calculate_alpha(dataset, num_classes=4, device="cpu"):
     alpha = []
 
     for i in range(num_classes):
-
-        class_count = counts.get(i, 0)
-
-        weight = 1.0 - (class_count / total)
-
+        class_count = counts.get(i, 1)  # avoid division by 0
+        weight = 1.0 / class_count
         alpha.append(weight)
 
-    return torch.tensor(alpha).to(device), counts
+    alpha = torch.tensor(alpha, dtype=torch.float32)
+
+    # normalize (so sum = num_classes or 1)
+    alpha = alpha / alpha.sum()
+
+    # manually reduce "none" class (class 3)
+    alpha[3] *= 0.3  # tune (0.1 ~ 0.5 depending on how much ignorance)
+    alpha = alpha / alpha.sum()
+
+    return alpha.to(device), counts
