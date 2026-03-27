@@ -16,9 +16,9 @@ class PhoBERTMultiHead(nn.Module):
         for param in self.phobert.parameters():
             param.requires_grad = False
 
-        # unfreeze 1 last layers of PhoBERT
-        for param in self.phobert.encoder.layer[-2:].parameters():
-            param.requires_grad = True
+        # # unfreeze 2 last layers of PhoBERT
+        # for param in self.phobert.encoder.layer[-2:].parameters():
+        #     param.requires_grad = True
 
         hidden_size = self.phobert.config.hidden_size
         self.attentions = nn.ModuleList(
@@ -39,7 +39,7 @@ class PhoBERTMultiHead(nn.Module):
             input_ids=input_ids, attention_mask=attention_mask
         )
 
-        hidden = outputs.last_hidden_state  # (B, T, H)
+        hidden = outputs.last_hidden_state  # (B, T, H) e.g. [64, 10, 768]
 
         logits = []
 
@@ -62,6 +62,7 @@ class PhoBERTMultiHead(nn.Module):
             aspect_embedding = self.norm(aspect_embedding)
             aspect_embedding = self.dropout(aspect_embedding)
 
+            # list of (B, num_sentiments)
             logits.append(classifier(aspect_embedding))
 
         logits = torch.stack(logits, dim=1)
