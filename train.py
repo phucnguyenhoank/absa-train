@@ -69,11 +69,9 @@ def main(args):
 
         print(f"\nEpoch {epoch+1}")
 
-        train_loss = train_epoch(
-            model, train_loader, optimizer, criterion, device
-        )
+        train_loss = train_epoch(model, train_loader, optimizer, device)
 
-        val_loss = eval_epoch(model, val_loader, criterion, device)
+        val_loss = eval_epoch(model, val_loader, device)
 
         print("Train loss:", train_loss)
         print("Val loss:", val_loss)
