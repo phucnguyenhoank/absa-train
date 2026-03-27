@@ -21,7 +21,7 @@ def load_and_fix_dataset(file_path):
 ds = DatasetDict(
     {
         "train": load_and_fix_dataset(
-            "multisentiment-uit-vsfc/df_sampled_final_train.csv"
+            "multisentiment-uit-vsfc/df_final_train.csv"
         ),
         "validation": load_and_fix_dataset(
             "multisentiment-uit-vsfc/df_final_validation.csv"
