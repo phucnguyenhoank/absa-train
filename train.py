@@ -56,6 +56,7 @@ def main(args):
 
     alpha, counts = calculate_alpha(train_data, device=device)
     print(f"Class counts: {counts}")
+    print(f"Focal loss alpha: {alpha}")
     best_val_loss = float("inf")
     patience_counter = 0
     train_losses = []

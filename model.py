@@ -24,7 +24,7 @@ class PhoBERTMultiHead(nn.Module):
         self.attentions = nn.ModuleList(
             [nn.Linear(hidden_size, 1) for _ in range(num_aspects)]
         )
-        mid_dim = 128
+        mid_dim = 32
         self.classifiers = nn.ModuleList(
             [
                 nn.Sequential(
