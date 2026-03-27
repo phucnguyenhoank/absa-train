@@ -1,5 +1,17 @@
 import torch
 
-l = [torch.rand(size=(2, 3)) for _ in range(4)]
-o = torch.stack(l, dim=1)
-print(o.shape)
+B = 2
+n_aspect = 4
+n_sentiment = 3
+outputs = torch.randn(size=(B, n_aspect, n_sentiment))
+print(outputs)
+
+probs = torch.sigmoid(outputs)
+print(probs)
+
+max_probs, _ = torch.max(probs, dim=-1)
+print(max_probs)
+
+top2_values, top2_indices = torch.topk(max_probs, k=2, dim=-1)
+print(top2_values)
+print(top2_indices)

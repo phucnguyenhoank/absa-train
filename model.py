@@ -96,14 +96,14 @@ class MultiHeadSigmoid(nn.Module):
             [nn.Linear(hidden_size, 1) for _ in range(num_aspects)]
         )
 
-        mid_dim = 128
+        mid_dim = 64
         self.sentiment_classifiers = nn.ModuleList(
             [
                 nn.Sequential(
                     nn.Linear(hidden_size, mid_dim),
                     nn.BatchNorm1d(mid_dim),
                     nn.ReLU(),
-                    nn.Dropout(p=0.3),
+                    nn.Dropout(p=0.5),
                     nn.Linear(mid_dim, num_sentiments),  # Output: 3 nodes
                 )
                 for _ in range(num_aspects)

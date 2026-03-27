@@ -13,7 +13,7 @@ from data import train_dataset, val_dataset
 from model import MultiHeadSigmoid
 from trainer import train_epoch, eval_epoch
 
-# from utils import calculate_alpha
+from utils import calculate_alpha
 from record import upload_blob
 from preprocess import tokenizer
 
@@ -57,9 +57,9 @@ def main(args):
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
     criterion = nn.BCEWithLogitsLoss()
 
-    # alpha, counts = calculate_alpha(train_data, device=device)
-    # print(f"Class counts: {counts}")
-    # print(f"Focal loss alpha: {alpha}")
+    alpha, counts = calculate_alpha(train_data, device=device)
+    print(f"Class counts: {counts}")
+    print(f"Focal loss alpha: {alpha}")
     best_val_loss = float("inf")
     patience_counter = 0
     train_losses = []
