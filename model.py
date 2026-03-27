@@ -24,11 +24,15 @@ class PhoBERTMultiHead(nn.Module):
         self.attentions = nn.ModuleList(
             [nn.Linear(hidden_size, 1) for _ in range(num_aspects)]
         )
-        self.dropout = nn.Dropout(0.3)
-        self.norm = nn.LayerNorm(hidden_size)
         self.classifiers = nn.ModuleList(
             [
-                nn.Linear(hidden_size, num_sentiments)
+                nn.Sequential(
+                    nn.Linear(hidden_size, 512),
+                    nn.BatchNorm1d(512),
+                    nn.ReLU(),
+                    nn.Dropout(p=0.3),
+                    nn.Linear(512, num_sentiments),
+                )
                 for _ in range(num_aspects)
             ]
         )
@@ -58,9 +62,6 @@ class PhoBERTMultiHead(nn.Module):
             aspect_embedding = torch.sum(
                 hidden * weights.unsqueeze(-1), dim=1
             )  # (B, H)
-
-            aspect_embedding = self.norm(aspect_embedding)
-            aspect_embedding = self.dropout(aspect_embedding)
 
             # list of (B, num_sentiments)
             logits.append(classifier(aspect_embedding))
