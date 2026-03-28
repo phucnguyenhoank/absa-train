@@ -56,10 +56,8 @@ def main(args):
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
 
-    # Weights for [Negative, Neutral, Positive]
-    # We give Neutral a higher weight (2.5) than the others (1.5)
-    # to force the model to improve that 0.06 recall.
-    sentiment_weights = torch.tensor([1.5, 2.5, 1.5])
+    # Negative: 1.5, Neutral: 4.5 (Bumped!), Positive: 1.5
+    sentiment_weights = torch.tensor([1.5, 4.5, 1.5])
 
     # Expand to all 4 aspects -> Shape (4, 3)
     pos_weight = sentiment_weights.repeat(4, 1).to(device)
