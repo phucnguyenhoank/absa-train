@@ -1,29 +1,6 @@
 import torch
 
 
-def focal_binary_cross_entropy(logits, targets, gamma=2.0, alpha=1.0):
-    """
-    Focal Loss for multi-label classification.
-    logits: (B, 4, 3)
-    targets: (B, 4, 3)
-    """
-    p = torch.sigmoid(logits)
-    p_t = p * targets + (1 - p) * (
-        1 - targets
-    )  # probability of the correct class
-
-    bce_loss = torch.nn.functional.binary_cross_entropy_with_logits(
-        logits, targets, reduction="none"
-    )
-
-    # The Focal factor (1 - pt)^gamma
-    focal_weight = (1 - p_t) ** gamma
-
-    loss = alpha * focal_weight * bce_loss
-
-    return loss.mean()
-
-
 def train_epoch(model, dataloader, optimizer, device, criterion):
     model.train()
 
@@ -37,8 +14,13 @@ def train_epoch(model, dataloader, optimizer, device, criterion):
             input_ids=batch["input_ids"],
             attention_mask=batch["attention_mask"],
         )
-        # loss = focal_binary_cross_entropy(outputs, batch["labels"])
-        loss = criterion(outputs, batch["labels"])
+        loss_dict = criterion(
+            outputs["aspect_logits"],
+            outputs["sentiment_logits"],
+            batch["aspect_labels"],
+            batch["sentiment_labels"],
+        )
+        loss = loss_dict["loss"]
 
         optimizer.zero_grad()
         loss.backward()
@@ -68,7 +50,13 @@ def eval_epoch(model, dataloader, device, criterion):
                 input_ids=batch["input_ids"],
                 attention_mask=batch["attention_mask"],
             )
-            loss = criterion(outputs, batch["labels"])
+            loss_dict = criterion(
+                outputs["aspect_logits"],
+                outputs["sentiment_logits"],
+                batch["aspect_labels"],
+                batch["sentiment_labels"],
+            )
+            loss = loss_dict["loss"]
 
             total_loss += loss.item()
 

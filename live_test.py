@@ -11,7 +11,7 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model = load_model(TEST_MODEL_NAME).to(DEVICE)
 model.eval()
 
-test_sentence = "thầy thân thiện, nhưng bài tập thì khó"
+test_sentence = "giảng viên dạy tạm được"
 
 # 1. Preprocess & Tokenize
 dot_separated_segmented_sentences = rdrsegmenter.word_segment(test_sentence)

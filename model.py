@@ -182,3 +182,79 @@ class SimpleMultiHeadSigmoid(nn.Module):
         logits = logits.view(-1, self.num_aspects, self.num_sentiments)
 
         return logits
+
+
+class ConditionalAspectSentimentModel(nn.Module):
+    def __init__(self, backbone_model_name, num_aspects=4, num_sentiments=3):
+        super().__init__()
+
+        self.num_aspects = num_aspects
+        self.num_sentiments = num_sentiments
+
+        # =========================
+        # 1. Backbone
+        # =========================
+        self.backbone = AutoModel.from_pretrained(backbone_model_name)
+
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+
+        hidden_size = self.backbone.config.hidden_size
+
+        # =========================
+        # 2. Aspect head
+        # =========================
+        self.aspect_head = nn.Linear(hidden_size, num_aspects)
+
+        # =========================
+        # 3. Aspect embeddings
+        # =========================
+        self.aspect_embedding = nn.Embedding(num_aspects, hidden_size)
+
+        # =========================
+        # 4. Sentiment head (MLP)
+        # =========================
+        self.sentiment_mlp = nn.Sequential(
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, num_sentiments),
+        )
+
+    def forward(self, input_ids, attention_mask):
+        # =========================
+        # Backbone
+        # =========================
+        outputs = self.backbone(
+            input_ids=input_ids, attention_mask=attention_mask
+        )
+
+        cls_output = outputs.last_hidden_state[:, 0, :]  # (B, H)
+
+        # =========================
+        # Aspect prediction
+        # =========================
+        aspect_logits = self.aspect_head(cls_output)  # (B, 4)
+
+        # =========================
+        # Build aspect-conditioned features
+        # =========================
+        B, H = cls_output.shape
+
+        # (4, H)
+        aspect_emb = self.aspect_embedding.weight
+
+        # (B, 4, H)
+        cls_expand = cls_output.unsqueeze(1).expand(-1, self.num_aspects, -1)
+
+        # Combine (simple but effective)
+        aspect_features = cls_expand + aspect_emb  # (B, 4, H)
+
+        # =========================
+        # Sentiment prediction
+        # =========================
+        sentiment_logits = self.sentiment_mlp(aspect_features)  # (B, 4, 3)
+
+        return {
+            "aspect_logits": aspect_logits,
+            "sentiment_logits": sentiment_logits,
+        }

@@ -9,8 +9,13 @@ from transformers import DataCollatorWithPadding
 
 from config import *
 from data import train_dataset, val_dataset
+from loss import AspectSentimentLoss
 
-from model import SimpleMultiHeadSigmoid, MultiHeadSigmoid
+from model import (
+    SimpleMultiHeadSigmoid,
+    MultiHeadSigmoid,
+    ConditionalAspectSentimentModel,
+)
 from trainer import train_epoch, eval_epoch
 
 # from utils import calculate_alpha
@@ -43,7 +48,7 @@ def main(args):
         val_data, batch_size=BATCH_SIZE, collate_fn=collator
     )
 
-    model = MultiHeadSigmoid(
+    model = ConditionalAspectSentimentModel(
         backbone_model_name,
         num_aspects=len(idx2topic),
         num_sentiments=len(idx2sentiment),
@@ -56,14 +61,8 @@ def main(args):
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
 
-    # Negative: 1.5, Neutral: 4.5 (Bumped!), Positive: 1.5
-    sentiment_weights = torch.tensor([1.5, 4.5, 1.5])
-
-    # Expand to all 4 aspects -> Shape (4, 3)
-    pos_weight = sentiment_weights.repeat(4, 1).to(device)
-
     # Use this in your training script
-    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    criterion = AspectSentimentLoss(device)
 
     # alpha, counts = calculate_alpha(train_data, device=device)
     # print(f"Class counts: {counts}")
