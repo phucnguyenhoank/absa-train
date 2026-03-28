@@ -24,7 +24,7 @@ def focal_binary_cross_entropy(logits, targets, gamma=2.0, alpha=1.0):
     return loss.mean()
 
 
-def train_epoch(model, dataloader, optimizer, device):
+def train_epoch(model, dataloader, optimizer, device, criterion):
     model.train()
 
     total_loss = 0
@@ -37,7 +37,8 @@ def train_epoch(model, dataloader, optimizer, device):
             input_ids=batch["input_ids"],
             attention_mask=batch["attention_mask"],
         )
-        loss = focal_binary_cross_entropy(outputs, batch["labels"])
+        # loss = focal_binary_cross_entropy(outputs, batch["labels"])
+        loss = criterion(outputs, batch["labels"])
 
         optimizer.zero_grad()
         loss.backward()
@@ -51,7 +52,7 @@ def train_epoch(model, dataloader, optimizer, device):
     return total_loss / len(dataloader)
 
 
-def eval_epoch(model, dataloader, device):
+def eval_epoch(model, dataloader, device, criterion):
 
     model.eval()
 
@@ -67,7 +68,7 @@ def eval_epoch(model, dataloader, device):
                 input_ids=batch["input_ids"],
                 attention_mask=batch["attention_mask"],
             )
-            loss = focal_binary_cross_entropy(outputs, batch["labels"])
+            loss = criterion(outputs, batch["labels"])
 
             total_loss += loss.item()
 

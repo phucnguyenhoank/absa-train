@@ -1,5 +1,5 @@
 import torch
-from model import SimpleMultiHeadSigmoid
+from model import SimpleMultiHeadSigmoid, MultiHeadSigmoid
 from config import backbone_model_name
 
 

@@ -10,7 +10,7 @@ from transformers import DataCollatorWithPadding
 from config import *
 from data import train_dataset, val_dataset
 
-from model import SimpleMultiHeadSigmoid
+from model import SimpleMultiHeadSigmoid, MultiHeadSigmoid
 from trainer import train_epoch, eval_epoch
 
 # from utils import calculate_alpha
@@ -43,7 +43,7 @@ def main(args):
         val_data, batch_size=BATCH_SIZE, collate_fn=collator
     )
 
-    model = SimpleMultiHeadSigmoid(
+    model = MultiHeadSigmoid(
         backbone_model_name,
         num_aspects=len(idx2topic),
         num_sentiments=len(idx2sentiment),
@@ -55,7 +55,17 @@ def main(args):
             print(name)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
-    criterion = nn.BCEWithLogitsLoss()
+
+    # Weights for [Negative, Neutral, Positive]
+    # We give Neutral a higher weight (2.5) than the others (1.5)
+    # to force the model to improve that 0.06 recall.
+    sentiment_weights = torch.tensor([1.5, 2.5, 1.5])
+
+    # Expand to all 4 aspects -> Shape (4, 3)
+    pos_weight = sentiment_weights.repeat(4, 1).to(device)
+
+    # Use this in your training script
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
     # alpha, counts = calculate_alpha(train_data, device=device)
     # print(f"Class counts: {counts}")
@@ -69,9 +79,11 @@ def main(args):
 
         print(f"\nEpoch {epoch+1}")
 
-        train_loss = train_epoch(model, train_loader, optimizer, device)
+        train_loss = train_epoch(
+            model, train_loader, optimizer, device, criterion
+        )
 
-        val_loss = eval_epoch(model, val_loader, device)
+        val_loss = eval_epoch(model, val_loader, device, criterion)
 
         print("Train loss:", train_loss)
         print("Val loss:", val_loss)
