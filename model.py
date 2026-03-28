@@ -238,7 +238,6 @@ class ConditionalAspectSentimentModel(nn.Module):
         # =========================
         # Build aspect-conditioned features
         # =========================
-        B, H = cls_output.shape
 
         # (4, H)
         aspect_emb = self.aspect_embedding.weight

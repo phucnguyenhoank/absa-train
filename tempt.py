@@ -1,17 +1,21 @@
 import torch
+import torch.nn as nn
+from loss import AspectSentimentLoss
 
-B = 2
-n_aspect = 4
-n_sentiment = 3
-outputs = torch.randn(size=(B, n_aspect, n_sentiment))
-print(outputs)
+ce = nn.CrossEntropyLoss(ignore_index=-100)
 
-probs = torch.sigmoid(outputs)
-print(probs)
+x = torch.arange(12)
 
-max_probs, _ = torch.max(probs, dim=-1)
-print(max_probs)
+y = x.view(2, 2, 3)
 
-top2_values, top2_indices = torch.topk(max_probs, k=2, dim=-1)
-print(top2_values)
-print(top2_indices)
+for i in range(2):
+    for j in range(2):
+        for k in range(3):
+            print(y[i][j][k])
+
+
+z = x.view(4, 3)
+
+for i in range(4):
+    for j in range(3):
+        print(z[i][j])

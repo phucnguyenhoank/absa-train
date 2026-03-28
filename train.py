@@ -4,6 +4,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, Subset
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from transformers import DataCollatorWithPadding
 
@@ -60,20 +61,21 @@ def main(args):
             print(name)
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate)
-
+    scheduler = ReduceLROnPlateau(
+        optimizer,
+        mode="min",  # Theo dõi giá trị nhỏ nhất (Loss)
+        factor=0.5,  # Khi giảm sẽ nhân LR với 0.5 (2e-5 -> 1e-5)
+        patience=SCHEDULER_PATIENCE,  # Val Loss không giảm thì "ra tay"
+    )
     # Use this in your training script
     criterion = AspectSentimentLoss(device)
 
-    # alpha, counts = calculate_alpha(train_data, device=device)
-    # print(f"Class counts: {counts}")
-    # print(f"Focal loss alpha: {alpha}")
     best_val_loss = float("inf")
     patience_counter = 0
     train_losses = []
     val_losses = []
 
     for epoch in range(running_epochs):
-
         print(f"\nEpoch {epoch+1}")
 
         train_loss = train_epoch(
@@ -87,6 +89,8 @@ def main(args):
 
         train_losses.append(train_loss)
         val_losses.append(val_loss)
+
+        scheduler.step(val_loss)
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
@@ -102,7 +106,7 @@ def main(args):
         else:
             patience_counter += 1
 
-        if patience_counter >= PATIENCE:
+        if patience_counter >= EARLY_STOPPING_PATIENCE:
             print(f"Early stopping at epoch {epoch+1}")
             break
 

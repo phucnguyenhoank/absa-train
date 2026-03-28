@@ -17,8 +17,8 @@ class AspectSentimentLoss(nn.Module):
         self,
         aspect_logits,  # (B, 4)
         sentiment_logits,  # (B, 4, 3)
-        aspect_labels,
-        sentiment_labels,
+        aspect_labels,  # (B, 4)
+        sentiment_labels,  # (B, 4)
     ):
         # =========================
         # Aspect loss
