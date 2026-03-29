@@ -1,0 +1,31 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    In["Input IDs & Mask"] --> BB["PhoBERT Backbone (Frozen)"]
+    BB --> CLS["Extract CLS Token <br><i>(B, H)</i>"]
+
+    subgraph "Aspect Branch"
+        AH["Linear Head <br><i>(H → 4)</i>"]
+        AL["Aspect Logits <br><i>(B, 4)</i>"]
+    end
+
+    subgraph "Sentiment Branch"
+        UN["Unsqueeze & Expand <br><i>(B, 4, H)</i>"]
+        AE["Aspect Embedding <br><i>(4, H)</i>"]
+        ADD["Element-wise Add <br><i>(B, 4, H)</i>"]
+        MLP["Sentiment MLP <br><i>(B, 4, 3)</i>"]
+    end
+
+    CLS --> AH & UN
+    AH --> AL
+    UN & AE --> ADD
+    ADD --> MLP
+
+    AL & MLP --> OUT["Dictionary Output <br><i>{ aspect_logits, sentiment_logits }</i>"]
+
+    style AE fill:#fff9c4,stroke:#fbc02d
+    style ADD fill:#ffccbc,stroke:#e64a19
+    style BB fill:#d1e7ff,stroke:#004a99
+    style OUT fill:#d4edda,stroke:#155724

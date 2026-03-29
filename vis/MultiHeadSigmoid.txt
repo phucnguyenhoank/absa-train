@@ -1,0 +1,37 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    In["Input IDs & Attention Mask"] --> BB["PhoBERT Backbone (Frozen)"]
+    BB --> H["Hidden States <br><i>(B, T, H)</i>"]
+
+    subgraph subGraph0["Aspect-Specific Attention"]
+        direction TB
+        Att["Linear Projection <br><i>(H → 1)</i>"]
+        Mask["Masking & Softmax <br><i>(B, T)</i>"]
+        X["fa:fa-times Weighted Sum"]
+        Context["<b>Context Vector</b> <br><i>(B, H)</i>"]
+    end
+    subgraph subGraph1["Sentiment Classification (Multi-Head)"]
+        direction LR
+
+        S1["Head 1: Lecturer <br><i>(Linear + BatchNorm + ReLU + Dropout)</i><br><i>(B, 3)</i>"]
+        S2["Head 2: Program <br><i>(B, 3)</i>"]
+        S3["Head 3: Facility <br><i>(B, 3)</i>"]
+        S4["Head 4: Others <br><i>(B, 3)</i>"]
+    end
+
+    H --> Att
+    Att --> Mask
+    H --- X
+    Mask --- X
+    X --> Context
+    Context --> S1 & S2 & S3 & S4
+    S1 & S2 & S3 & S4 --> Out["Final Tensor <br><i>(B, 4, 3)</i>"]
+    style BB fill:#eceff1,stroke:#455a64
+    style Mask fill:#e1f5fe,stroke:#01579b
+    style X fill:#fff,stroke:#333,stroke-dasharray: 5 5
+    style Context fill:#ffeb3b,stroke:#fbc02d,stroke-width:4px
+    style Out fill:#c8e6c9,stroke:#2e7d32
+    style subGraph1 fill:#f9f9f9,stroke:#333,stroke-dasharray: 5 5

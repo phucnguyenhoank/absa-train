@@ -110,7 +110,7 @@ class MultiHeadSigmoid(nn.Module):
             ]
         )
 
-    def forward(self, input_ids, attention_mask):
+    def forward(self, input_ids, attention_mask, return_attentions=False):
         # Lấy hidden states từ PhoBERT
         outputs = self.backbone(
             input_ids=input_ids, attention_mask=attention_mask
@@ -120,7 +120,7 @@ class MultiHeadSigmoid(nn.Module):
         )  # Shape: (Batch, Seq_Len, Hidden_Size)
 
         all_aspect_logits = []
-
+        all_attention_weights = []
         for i in range(self.num_aspects):
             # 1. Tính Attention cho aspect thứ i
             # (B, T, H) -> (B, T, 1) -> (B, T)
@@ -131,6 +131,9 @@ class MultiHeadSigmoid(nn.Module):
 
             # Chuẩn hóa trọng số attention
             weights = torch.softmax(attn_scores, dim=1)  # (B, T)
+
+            # LƯU attention lại
+            all_attention_weights.append(weights)
 
             # 2. Tổng hợp vector đại diện cho aspect (Weighted Sum)
             # (B, T, H) * (B, T, 1) -> sum theo T -> (B, H)
@@ -143,6 +146,11 @@ class MultiHeadSigmoid(nn.Module):
 
         # Gộp lại thành tensor duy nhất: (Batch, 4, 3)
         logits = torch.stack(all_aspect_logits, dim=1)
+
+        if return_attentions:
+            # (num_aspects, B, T) -> (B, num_aspects, T)
+            attentions = torch.stack(all_attention_weights, dim=1)
+            return logits, attentions
 
         return logits
 

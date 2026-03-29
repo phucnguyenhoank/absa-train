@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+ not_program     0.8502    0.6937    0.7640      4025
+     program     0.5416    0.7476    0.6282      1949
+
+    accuracy                         0.7112      5974
+   macro avg     0.6959    0.7206    0.6961      5974
+weighted avg     0.7495    0.7112    0.7197      5974

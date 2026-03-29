@@ -1,0 +1,22 @@
+---
+config:
+  layout: dagre
+---
+flowchart TB
+ subgraph " "
+        FC["Linear Layer <br><i>(Hidden_Size → 12)</i>"]
+        CLS["Extract CLS Token <br><i>(Batch, Hidden_Size)</i>"]
+        Flat["Flat Logits <br><i>(Batch, 12)</i>"]
+        V[".view(-1, 4, 3)"]
+  end
+    In["Input IDs & Attention Mask"] --> BB["PhoBERT Backbone (Frozen)"]
+    BB --> CLS
+    CLS --> FC
+    FC --> Flat
+    Flat --> V
+    V --> Out["Output Tensor <br><i>(Batch, 4, 3)</i>"]
+    Out -.-> A1["Aspect 1: (Neg, Neu, Pos)"] & A2["Aspect 2: (Neg, Neu, Pos)"] & A3["Aspect 3: (Neg, Neu, Pos)"] & A4["Aspect 4: (Neg, Neu, Pos)"]
+
+    style V fill:#f96,stroke:#333,stroke-width:2px
+    style BB fill:#d1e7ff,stroke:#004a99
+    style Out fill:#d4edda,stroke:#155724

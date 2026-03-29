@@ -176,6 +176,8 @@ def compute_metrics(preds, labels):
             cmap="Blues",
         )
         plt.title("Sentiment Confusion Matrix (TP Aspects only)")
+        plt.xlabel("Predicted")
+        plt.ylabel("True")
         plt.savefig(os.path.join(output_dir, "sentiment_cm.png"))
         plt.close()
 
@@ -191,7 +193,7 @@ def compute_metrics(preds, labels):
 
 all_preds = []
 all_labels = []
-ratio_threshold = 0.1
+ratio_threshold = 0.5
 
 with torch.no_grad():
     model.eval()

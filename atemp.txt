@@ -1,0 +1,204 @@
+Mô hình SimpleMultiHeadSigmoid:
+BATCH_SIZE = 64
+EPOCHS = 1000
+PATIENCE = 6
+LEARNING_RATE = 2e-5
+
+Dừng sau 97 epoch.
+Train loss giảm từ 0.1303 đến 0.0589
+Val loss giảm từ 0.097 đến 0.0626.
+Loss giảm nhanh trong khoảng 30 epoch đầu tiên và chững lại dần.
+
+aspect_detection:
+              precision    recall  f1-score   support
+
+    lecturer     0.7107    0.9487    0.8127      3667
+     program     0.5416    0.7476    0.6282      1949
+    facility     0.8559    0.6994    0.7698      1630
+      others     0.5550    0.4798    0.5147      1536
+
+   micro avg     0.6650    0.7758    0.7161      8782
+   macro avg     0.6658    0.7189    0.6813      8782
+weighted avg     0.6729    0.7758    0.7116      8782
+ samples avg     0.7099    0.8211    0.7410      8782
+
+
+sentiment_overall (aspect was right only):
+              precision    recall  f1-score   support
+
+    negative     0.6835    0.8380    0.7529      2660
+     neutral     0.5298    0.1747    0.2627      1477
+    positive     0.7328    0.8393    0.7824      2676
+
+    accuracy                         0.6947      6813
+   macro avg     0.6487    0.6173    0.5994      6813
+weighted avg     0.6695    0.6947    0.6582      6813
+
+---------------------
+Mô hình MultiHeadSigmoid (attention)
+BATCH_SIZE = 64
+EPOCHS = 1000
+PATIENCE = 6
+LEARNING_RATE = 2e-5
+Dropout=0.5
+mid_dim = 32 (hidden_size -> mid_dim -> num_sentiments) trong 4 classifier heads.
+pos_weights
+   # Negative: 1.5, Neutral: 4.5 (Bumped!), Positive: 1.5
+   sentiment_weights = torch.tensor([1.5, 4.5, 1.5])
+
+   # Expand to all 4 aspects -> Shape (4, 3)
+   pos_weight = sentiment_weights.repeat(4, 1).to(device)
+
+   # Use this in your training script
+   criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+
+Dừng sau 24 epoch.
+Train loss giảm từ 0.8 đến 0.28
+Val loss giảm từ 0.7 đến 0.42.
+Loss giảm nhanh, hội tụ nhanh và mượt.
+
+aspect_detection:
+              precision    recall  f1-score   support
+
+    lecturer     0.7616    0.9242    0.8350      3667
+     program     0.6437    0.6988    0.6701      1949
+    facility     0.9113    0.8067    0.8558      1630
+      others     0.6559    0.4753    0.5512      1536
+
+   micro avg     0.7450    0.7739    0.7592      8782
+   macro avg     0.7431    0.7263    0.7280      8782
+weighted avg     0.7447    0.7739    0.7526      8782
+ samples avg     0.7910    0.8155    0.7842      8782
+
+
+sentiment_overall (aspect was right only):
+              precision    recall  f1-score   support
+
+    negative     0.7182    0.8237    0.7674      2609
+     neutral     0.5173    0.4271    0.4679      1508
+    positive     0.8417    0.8040    0.8225      2679
+
+    accuracy                         0.7279      6796
+   macro avg     0.6924    0.6849    0.6859      6796
+weighted avg     0.7223    0.7279    0.7226      6796
+
+[thêm một số details do đây là mô hình đề xuất]
+Recall của aspect others thấp hơn so với những nhãn khác (những nhãn khác
+từ 0.7 của program đến 0.9 của lecturer):
+              precision    recall  f1-score   support
+
+  not_others     0.8342    0.9137    0.8721      4438
+      others     0.6559    0.4753    0.5512      1536
+
+    accuracy                         0.8010      5974
+   macro avg     0.7450    0.6945    0.7116      5974
+weighted avg     0.7883    0.8010    0.7896      5974
+
+Hiệu suất dự đoán sentiment của facility thấp:
+sentiment_facility:
+              precision    recall  f1-score   support
+
+    negative       0.50      0.83      0.63       547
+     neutral       0.44      0.13      0.20       487
+    positive       0.69      0.65      0.67       281
+
+    accuracy                           0.53      1315
+   macro avg       0.54      0.54      0.50      1315
+weighted avg       0.52      0.53      0.48      1315
+
+
+
+-----------------------
+Mô hình ConditionalAspectSentimentModel
+BATCH_SIZE = 64
+EPOCHS = 1000
+PATIENCE = 6
+LEARNING_RATE = 2e-5
+# lecturer, program, facility, others
+aspect_weights = torch.tensor([1.5, 2.0, 1.5, 4.5]).to(device)
+bce = nn.BCEWithLogitsLoss(pos_weight=aspect_weights)
+
+Dừng sau 64 epoch.
+Train loss giảm từ 1.984 đến 1.204
+Val loss giảm từ 1.836 đến 1.151.
+Val loss luôn thấp hơn train loss.
+Loss giảm đều và có đường cong khá giống nhau.
+Train loss giảm mượt mà nhưng val loss bị gồ ghề  mạnh dần ở những epoch cuối.
+
+aspect_detection:
+              precision    recall  f1-score   support
+
+    lecturer     0.7314    0.9215    0.8155      3667
+     program     0.5508    0.6624    0.6014      1949
+    facility     0.9059    0.5785    0.7061      1630
+      others     0.3175    0.7376    0.4440      1536
+
+   micro avg     0.5829    0.7682    0.6628      8782
+   macro avg     0.6264    0.7250    0.6418      8782
+weighted avg     0.6513    0.7682    0.6827      8782
+ samples avg     0.5923    0.8116    0.6619      8782
+
+
+sentiment_overall (aspect was right only):
+              precision    recall  f1-score   support
+
+    negative     0.7246    0.8000    0.7605      2635
+     neutral     0.5682    0.2338    0.3313      1390
+    positive     0.7096    0.8515    0.7741      2721
+
+    accuracy                         0.7041      6746
+   macro avg     0.6675    0.6284    0.6220      6746
+weighted avg     0.6864    0.7041    0.6775      6746
+
+
+
+-----------------------
+Mô hình ConditionalAspectSentimentModel lần 2
+BATCH_SIZE = 128
+EPOCHS = 1000
+EARLY_STOPPING_PATIENCE = 10
+SCHEDULER_PATIENCE = 3
+LEARNING_RATE = 2e-5
+scheduler = ReduceLROnPlateau(
+   optimizer,
+   mode="min",  # Theo dõi giá trị nhỏ nhất (Loss)
+   factor=0.5,  # Khi giảm sẽ nhân LR với 0.5 (2e-5 -> 1e-5)
+   patience=SCHEDULER_PATIENCE,  # Val Loss không giảm thì "ra tay"
+)
+# lecturer, program, facility, others
+aspect_weights = torch.tensor([1.5, 2.0, 1.5, 4.5]).to(device)
+bce = nn.BCEWithLogitsLoss(pos_weight=aspect_weights)
+
+Dừng sau 61 epoch.
+Train loss giảm từ 1.989 đến 1.292
+Val loss giảm từ 1.87 đến 1.23.
+
+Xu hướng learning curver giống với cấu hình của ConditionalAspectSentimentModel trước đó
+chỉ khác là val loss ít gồ ghề hơn do đã có learning rate scheduler. 
+Val loss luôn thấp hơn train loss và cả 2 có xu hướng giảm giống nhau.
+al loss vẫn bị gồ ghề  mạnh dần ở những epoch cuối nhưng nhẹ hơn.
+
+aspect_detection:
+              precision    recall  f1-score   support
+
+    lecturer     0.7117    0.9264    0.8050      3667
+     program     0.5596    0.6188    0.5877      1949
+    facility     0.9058    0.4485    0.5999      1630
+      others     0.2959    0.7298    0.4211      1536
+
+   micro avg     0.5602    0.7350    0.6358      8782
+   macro avg     0.6183    0.6809    0.6034      8782
+weighted avg     0.6413    0.7350    0.6516      8782
+ samples avg     0.5701    0.7835    0.6373      8782
+
+
+sentiment_overall (aspect was right only):
+              precision    recall  f1-score   support
+
+    negative     0.7212    0.8222    0.7684      2570
+     neutral     0.5568    0.2734    0.3667      1273
+    positive     0.7462    0.8285    0.7852      2612
+
+    accuracy                         0.7165      6455
+   macro avg     0.6747    0.6413    0.6401      6455
+weighted avg     0.6989    0.7165    0.6960      6455

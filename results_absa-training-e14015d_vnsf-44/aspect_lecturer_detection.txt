@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+not_lecturer     0.8258    0.3862    0.5263      2307
+    lecturer     0.7107    0.9487    0.8127      3667
+
+    accuracy                         0.7315      5974
+   macro avg     0.7682    0.6675    0.6695      5974
+weighted avg     0.7552    0.7315    0.7021      5974

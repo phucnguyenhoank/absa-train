@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+not_facility     0.8944    0.9558    0.9241      4344
+    facility     0.8559    0.6994    0.7698      1630
+
+    accuracy                         0.8858      5974
+   macro avg     0.8751    0.8276    0.8469      5974
+weighted avg     0.8839    0.8858    0.8820      5974

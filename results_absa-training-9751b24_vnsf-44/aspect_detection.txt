@@ -1,0 +1,11 @@
+              precision    recall  f1-score   support
+
+    lecturer     0.7314    0.9215    0.8155      3667
+     program     0.5508    0.6624    0.6014      1949
+    facility     0.9059    0.5785    0.7061      1630
+      others     0.3175    0.7376    0.4440      1536
+
+   micro avg     0.5829    0.7682    0.6628      8782
+   macro avg     0.6264    0.7250    0.6418      8782
+weighted avg     0.6513    0.7682    0.6827      8782
+ samples avg     0.5923    0.8116    0.6619      8782
