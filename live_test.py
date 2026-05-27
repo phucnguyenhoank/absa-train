@@ -1,11 +1,12 @@
 import torch
-from load import load_model
-from preprocess import tokenizer, rdrsegmenter
+
 from config import (
-    idx2topic,
     idx2sentiment,
+    idx2topic,
 )
 from config_test import TEST_MODEL_NAME
+from load import load_model
+from preprocess import rdrsegmenter, tokenizer
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model = load_model(TEST_MODEL_NAME).to(DEVICE)

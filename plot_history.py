@@ -1,5 +1,7 @@
-import matplotlib.pyplot as plt
 import json
+
+import matplotlib.pyplot as plt
+
 from config_test import history_path
 
 with open(history_path) as f:

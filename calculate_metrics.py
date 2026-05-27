@@ -1,22 +1,22 @@
-import torch
-from torch.utils.data import DataLoader, Subset
-from transformers import DataCollatorWithPadding
-from sklearn.metrics import (
-    f1_score,
-    classification_report,
-    confusion_matrix,
-)
-import matplotlib.pyplot as plt
 import json
 import os
-import seaborn as sns
 
-from config import BATCH_SIZE, SUBSET_SIZE
+import matplotlib.pyplot as plt
+import seaborn as sns
+import torch
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    f1_score,
+)
+from torch.utils.data import DataLoader
+from transformers import DataCollatorWithPadding
+
+from config import BATCH_SIZE
+from config_test import TEST_MODEL_NAME, history_path
 from data import test_dataset
 from load import load_model
 from preprocess import tokenizer
-from config_test import TEST_MODEL_NAME, history_path
-
 
 # === Create output directory ===
 output_dir = f"results_{TEST_MODEL_NAME}"
@@ -160,7 +160,7 @@ def compute_metrics(preds, labels):
         sent_report = classification_report(
             all_s_true, all_s_pred, target_names=sentiment_names, digits=4
         )
-        print(f"\nSentiment for all aspects:")
+        print("\nSentiment for all aspects:")
         print(sent_report)
         save_text(sent_report, "sentiment_overall.txt")
 

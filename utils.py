@@ -1,5 +1,6 @@
-import torch
 from collections import Counter
+
+import torch
 
 
 def calculate_alpha(dataset, num_classes=4, device="cpu"):

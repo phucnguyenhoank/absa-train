@@ -1,10 +1,9 @@
 import torch
-from model import (
-    SimpleMultiHeadSigmoid,
-    MultiHeadSigmoid,
-    ConditionalAspectSentimentModel,
-)
+
 from config import backbone_model_name
+from model import (
+    MultiHeadSigmoid,
+)
 
 
 def load_model(check_point: str):

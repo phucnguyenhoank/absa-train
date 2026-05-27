@@ -4,7 +4,7 @@ Load trained model from .h5 file and make predictions
 """
 
 import pickle
-import numpy as np
+
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
@@ -58,7 +58,7 @@ class ABSAPairPredictor:
         self.num_topics = len(self.topic_mapping)
         self.num_pairs = self.num_sentiments * self.num_topics
 
-        print(f"\n[Model Metadata]")
+        print("\n[Model Metadata]")
         print(f"  Max sequence length: {self.max_seq_length}")
         print(f"  Number of sentiments: {self.num_sentiments}")
         print(f"  Number of topics: {self.num_topics}")
@@ -109,9 +109,9 @@ class ABSAPairPredictor:
         Returns:
             dict với keys: sentence, pairs, raw_predictions, binary_vector
         """
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"PREDICTION FOR: {sentence}")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
 
         # Tokenize và pad
         seq = self.tokenizer.texts_to_sequences([sentence.lower()])
@@ -140,11 +140,11 @@ class ABSAPairPredictor:
 
         # Show all probabilities if requested
         if show_all:
-            print(f"\n[All Pair Probabilities]")
+            print("\n[All Pair Probabilities]")
             print(
                 f"{'Index':<8} {'Pair':<45} {'Probability':<12} {'Binary':<8}"
             )
-            print(f"{'-'*73}")
+            print(f"{'-' * 73}")
 
             for pair_idx in range(self.num_pairs):
                 topic_idx = pair_idx // self.num_sentiments
@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
     print("\n\nBatch Results Summary:")
     for i, result in enumerate(results):
-        print(f"{i+1}. {result['sentence']}")
+        print(f"{i + 1}. {result['sentence']}")
         print(f"   Pairs found: {result['num_pairs']}")
         for pair in result["pairs"]:
             print(

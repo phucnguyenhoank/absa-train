@@ -1,6 +1,7 @@
-import pandas as pd
 import ast
 from collections import Counter
+
+import pandas as pd
 
 # 1. Load tập train vừa tạo
 df = pd.read_csv("multisentiment-uit-vsfc/df_final_train.csv")

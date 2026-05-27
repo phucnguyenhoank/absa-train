@@ -1,27 +1,23 @@
-import os
 import argparse
 import json
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, Subset
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+import os
 
+import torch
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, Subset
 from transformers import DataCollatorWithPadding
 
 from config import *
 from data import train_dataset, val_dataset
 from loss import AspectSentimentLoss
-
 from model import (
-    SimpleMultiHeadSigmoid,
-    MultiHeadSigmoid,
     ConditionalAspectSentimentModel,
 )
-from trainer import train_epoch, eval_epoch
+from preprocess import tokenizer
 
 # from utils import calculate_alpha
 from record import upload_blob
-from preprocess import tokenizer
+from trainer import eval_epoch, train_epoch
 
 
 def main(args):
@@ -76,7 +72,7 @@ def main(args):
     val_losses = []
 
     for epoch in range(running_epochs):
-        print(f"\nEpoch {epoch+1}")
+        print(f"\nEpoch {epoch + 1}")
 
         train_loss = train_epoch(
             model, train_loader, optimizer, device, criterion
@@ -107,7 +103,7 @@ def main(args):
             patience_counter += 1
 
         if patience_counter >= EARLY_STOPPING_PATIENCE:
-            print(f"Early stopping at epoch {epoch+1}")
+            print(f"Early stopping at epoch {epoch + 1}")
             break
 
     history = {"train_loss": train_losses, "val_loss": val_losses}
@@ -124,7 +120,6 @@ def main(args):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(

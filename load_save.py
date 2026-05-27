@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel, AutoTokenizer
 
 backbone_model_name = "vinai/phobert-base-v2"
 save_directory = "./phobert-base-v2"

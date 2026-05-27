@@ -1,16 +1,17 @@
+import pickle
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 import streamlit as st
 import torch
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import pickle
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 import load as attention_load
-from preprocess import tokenizer, rdrsegmenter
-from config import idx2topic, idx2sentiment
+from config import idx2sentiment, idx2topic
 from config_test import TEST_MODEL_NAME
+from preprocess import rdrsegmenter, tokenizer
 
 
 # =========================
@@ -78,7 +79,6 @@ if st.button("Phân tích") and sentence.strip():
     # CASE 1: PhoBERT + Attention
     # =========================
     if model_option == "PhoBERT + Attention":
-
         # =========================
         # 3. Preprocess
         # =========================

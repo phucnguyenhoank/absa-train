@@ -4,7 +4,6 @@ from transformers import AutoModel
 
 
 class PhoBERTMultiHead(nn.Module):
-
     def __init__(self, backbone_model_name, num_aspects, num_sentiments):
         super().__init__()
 
@@ -49,7 +48,6 @@ class PhoBERTMultiHead(nn.Module):
         logits = []
 
         for attn, classifier in zip(self.attentions, self.classifiers):
-
             # compute attention score for each token
             scores = attn(hidden).squeeze(-1)  # (B, T)
 

@@ -1,9 +1,10 @@
 # This contains segmenter and tokenizer for the raw input text
 
-from transformers import AutoTokenizer
-from pathlib import Path
-import py_vncorenlp
 import os
+from pathlib import Path
+
+import py_vncorenlp
+from transformers import AutoTokenizer
 
 from config import backbone_model_name
 

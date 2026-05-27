@@ -1,9 +1,9 @@
-import pandas as pd
-from datasets import Dataset, DatasetDict
 import ast
 
-from config import sentiment2idx, idx2topic
-from preprocess import tokenizer, rdrsegmenter
+import pandas as pd
+from datasets import Dataset, DatasetDict
+
+from preprocess import rdrsegmenter, tokenizer
 
 
 def load_and_fix_dataset(file_path):
@@ -78,7 +78,6 @@ def preprocess_function(examples):
     # examples["topic"] là list của các list: [[0, 2], [1], ...]
     # examples["sentiment"] là list của các list: [[2, 0], [1], ...] (đã bỏ nhãn 'none')
     for topics, sentiments in zip(examples["topic"], examples["sentiment"]):
-
         # 1. Tạo ma trận nhãn toàn số 0: (num_aspects=4, num_sentiments=3)
         # Hàng: Lecturer, Program, Facility, Others
         # Cột: Neg, Neu, Pos
@@ -109,7 +108,6 @@ def preprocess_function_2(examples):
     all_sentiment_labels = []
 
     for topics, sentiments in zip(examples["topic"], examples["sentiment"]):
-
         # =========================
         # 1. Aspect labels (4,)
         # =========================

@@ -7,7 +7,6 @@ def train_epoch(model, dataloader, optimizer, device, criterion):
     total_loss = 0
 
     for batch in dataloader:
-
         batch = {k: v.to(device) for k, v in batch.items()}
 
         outputs = model(
@@ -41,9 +40,7 @@ def eval_epoch(model, dataloader, device, criterion):
     total_loss = 0
 
     with torch.no_grad():
-
         for batch in dataloader:
-
             batch = {k: v.to(device) for k, v in batch.items()}
 
             outputs = model(
