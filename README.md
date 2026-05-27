@@ -37,19 +37,29 @@ streamlit run streamlit_app.py
 
 ---
 
-## Model Architecture
+## Model Architectures
 
-The model utilizes an **Attention Mechanism** to focus specifically on words relevant to the sentiment of each individual aspect.
+The project explores two architectures for multi-aspect sentiment classification on Vietnamese student feedback using a frozen PhoBERT backbone.
 
-### Attention Visualization
-The visualization demonstrates how the model assigns importance to specific tokens. For instance, the tokens `giảng_viên`, `nhiệt_tình` (enthusiastic) receive the highest attention weights when predicting the sentiment for the `Lecturer` aspect. Similarly, the tokens `lab`, `cũ` are highly weighted when determining the sentiment for the `Facility` aspect.
+### 1. Attention-Based Multi-Head Architecture
+
+This architecture applies a shared attention mechanism over PhoBERT hidden states to extract a contextual representation for sentiment classification across 4 aspects: Lecturer, Training Program, Facility, and Others.
+
+![Attention-Based Architecture](vis/MultiHeadSigmoid-2026-03-29-054222.png)
+
+#### Attention Visualization
+
+The visualization below demonstrates how the model assigns higher attention weights to sentiment-relevant tokens. For example, the tokens `giảng_viên`, `nhiệt_tình` receive stronger attention for the `Lecturer` aspect, while `lab`, `cũ` are emphasized for the `Facility` aspect.
 
 ![Attention Mechanism](vis/attention_demo.png)
 
+---
 
-### Pipeline Overview
-![Model Architecture](vis/MultiHeadSigmoid-2026-03-29-054222.png)
+### 2. Conditional-Aspect Architecture
 
+This architecture conditions sentiment prediction on learned aspect embeddings. The CLS representation from PhoBERT is combined with each aspect embedding to generate aspect-specific sentiment representations before classification.
+
+![Conditional Aspect Architecture](vis/ConditionalAspectSentimentModel-2026-03-28-190122.png)
 ---
 
 ## Current Limitations
